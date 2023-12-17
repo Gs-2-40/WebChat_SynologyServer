@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+</head>
+<body>
+    <a href="login">Back</a>
+    <h3 id="username">None</h3>
+    <textarea readonly id="mes">Hello world!</textarea>
+    <input type="text" id="mes" placeholder="Message">
+    <button type="submit" onclick="send()">Send</button>
+    <script>
+        function send() {
+            var text = document.getElementById("mes").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/send", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log("Text sent successfully!");
+                }
+            };
+
+            xhr.send(JSON.stringify({ text: text }));
+        }
+        function updateContent() {
+            fetch('/mes')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Обработка полученных данных
+                    document.getElementById('mes').innerHTML = data;
+                })
+                .catch(error => {
+                    // Обработка ошибок
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+        document.getElementById("username").textContent = getCookie("username");
+        setInterval(updateContent, 1000);
+    </script>
+</body>
+</html>
